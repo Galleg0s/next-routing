@@ -3,9 +3,11 @@ import classes from "./button.module.css";
 
 const Button = ({ link, children, onClick }) => {
   if (link) {
-    <Link href={link}>
-      <a className={classes.btn}>{children}</a>
-    </Link>;
+    return (
+      <Link href={link}>
+        <a className={classes.btn}>{children}</a>
+      </Link>
+    );
   }
 
   return (

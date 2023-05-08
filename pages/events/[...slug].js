@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { getFilteredEvents } from "../../data";
 import EventList from "../../components/events/event-list";
+import ResultsTitle from "../../components/events/results-title";
 
 const FilteredEvents = () => {
   const router = useRouter();
@@ -38,11 +39,13 @@ const FilteredEvents = () => {
     return <p className="center">No Events Found.</p>;
   }
 
+  const date = new Date(numYear, numMonth - 1);
+
   return (
-    <div>
-      <h1>Filtered Events</h1>
+    <>
+      <ResultsTitle date={date} />
       <EventList events={filteredEvents} />
-    </div>
+    </>
   );
 };
 
