@@ -48,6 +48,10 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
+h1 {
+  text-align: center;
+}
+
 h1,
 h2,
 h3 {
@@ -63,6 +67,10 @@ button {
   cursor: pointer;
 }
 
+div.center {
+  padding-top: 20px;
+  text-align: center;
+}
 p.center {
   width: 600px;
   margin: 0 auto;

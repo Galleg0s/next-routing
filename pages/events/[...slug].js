@@ -1,28 +1,10 @@
-import { useRouter } from "next/router";
 import { getFilteredEvents } from "../../data";
 import EventList from "../../components/events/event-list";
 import ResultsTitle from "../../components/events/results-title";
+import Button from "../../components/ui/button";
 
-const FilteredEvents = () => {
-  const router = useRouter();
-  const filterData = router.query.slug;
-
-  if (!filterData) {
-    return <p className="center">Loading...</p>;
-  }
-
-  const numYear = Number(filterData[0]);
-  const numMonth = Number(filterData[1]);
-
-  const invalidFilterValues =
-    isNaN(numYear) ||
-    isNaN(numMonth) ||
-    numYear > 2030 ||
-    numYear < 2022 ||
-    numMonth > 12 ||
-    numMonth < 1;
-
-  if (invalidFilterValues) {
+const FilteredEvents = ({ events, hasError, year, month }) => {
+  if (hasError) {
     return (
       <p className="center">
         Invalid filter values! Please adjust selected year or month.{" "}
@@ -30,23 +12,65 @@ const FilteredEvents = () => {
     );
   }
 
-  const filteredEvents = getFilteredEvents({
-    year: numYear,
-    month: numMonth,
-  });
-
-  if (filteredEvents.length === 0) {
-    return <p className="center">No Events Found.</p>;
+  if (!events) {
+    return <p className="center">Loading...</p>;
   }
 
-  const date = new Date(numYear, numMonth - 1);
+  if (events.length === 0) {
+    return (
+      <div className="center">
+        <Button link="/events">Show all events</Button>
+        <p className="center">No Events Found.</p>
+      </div>
+    );
+  }
+
+  const date = new Date(year, month - 1);
 
   return (
     <>
       <ResultsTitle date={date} />
-      <EventList events={filteredEvents} />
+      <EventList events={events} />
     </>
   );
 };
+
+export async function getServerSideProps(context) {
+  const { params } = context;
+
+  const filterData = params.slug;
+
+  const year = Number(filterData[0]);
+  const month = Number(filterData[1]);
+
+  const invalidFilterValues =
+    isNaN(year) ||
+    isNaN(month) ||
+    year > 2030 ||
+    year < 2022 ||
+    month > 12 ||
+    month < 1;
+
+  if (invalidFilterValues) {
+    return {
+      props: {
+        hasError: true,
+      },
+    };
+  }
+
+  const filteredEvents = getFilteredEvents({
+    year,
+    month,
+  });
+
+  return {
+    props: {
+      year,
+      month,
+      events: filteredEvents,
+    },
+  };
+}
 
 export default FilteredEvents;
