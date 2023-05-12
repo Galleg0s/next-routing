@@ -17,7 +17,7 @@ export const EventItem = ({ title, image, date, location, id }) => {
 
   return (
     <li className={classes.item}>
-      <Image width="200" height="200" src={"/" + image} alt="" />
+      <Image width="250" height="250" src={"/" + image} alt="" />
       <div className={classes.content}>
         <div className={classes.summary}>
           <h2>{title}</h2>

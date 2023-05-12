@@ -1,27 +1,46 @@
+import Head from "next/head";
 import { getFilteredEvents } from "../../data";
 import EventList from "../../components/events/event-list";
 import ResultsTitle from "../../components/events/results-title";
 import Button from "../../components/ui/button";
 
 const FilteredEvents = ({ events, hasError, year, month }) => {
+  const pageHeadData = (
+    <Head>
+      <title>Filtered NextJSEvents</title>
+      <meta name="description" content={`All events for ${month}/${year}.`} />
+    </Head>
+  );
+
   if (hasError) {
     return (
-      <p className="center">
-        Invalid filter values! Please adjust selected year or month.{" "}
-      </p>
+      <>
+        {pageHeadData}
+        <p className="center">
+          Invalid filter values! Please adjust selected year or month.
+        </p>
+      </>
     );
   }
 
   if (!events) {
-    return <p className="center">Loading...</p>;
+    return (
+      <>
+        {pageHeadData}
+        <p className="center">Loading...</p>
+      </>
+    );
   }
 
   if (events.length === 0) {
     return (
-      <div className="center">
-        <Button link="/events">Show all events</Button>
-        <p className="center">No Events Found.</p>
-      </div>
+      <>
+        {pageHeadData}
+        <div className="center">
+          <Button link="/events">Show all events</Button>
+          <p className="center">No Events Found.</p>
+        </div>
+      </>
     );
   }
 
@@ -29,6 +48,10 @@ const FilteredEvents = ({ events, hasError, year, month }) => {
 
   return (
     <>
+      <Head>
+        <title>Filtered NextJS Events</title>
+        <meta name="description" content={`All events for ${month}/${year}.`} />
+      </Head>
       <ResultsTitle date={date} />
       <EventList events={events} />
     </>
