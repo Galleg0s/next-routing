@@ -3,6 +3,7 @@ import { getEventById, getFeaturedEvents } from "../../data";
 import EventSummary from "../../components/event-detail/event-summary";
 import EventLogistics from "../../components/event-detail/event-logistics";
 import EventContent from "../../components/event-detail/event-content";
+import Comments from "../../components/input/comments";
 
 const EventDetailPage = ({ event }) => {
   if (!event) {
@@ -24,6 +25,7 @@ const EventDetailPage = ({ event }) => {
       />
       <EventContent>{event.description}</EventContent>
       <p className="center">{event.body}</p>
+      <Comments eventId={event.id}></Comments>
     </>
   );
 };
