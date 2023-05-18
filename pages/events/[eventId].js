@@ -57,13 +57,10 @@ export async function getStaticProps(context) {
 export async function getStaticPaths() {
   const events = getFeaturedEvents();
 
-  // Get the paths we want to prerender based on events
-  // Prerender all pages(slower builds, but faster initial page load)
   const paths = events.map((event) => ({
     params: { eventId: event.id },
   }));
 
-  // { fallback: false } means other routes should 404
   return { paths, fallback: true };
 }
 

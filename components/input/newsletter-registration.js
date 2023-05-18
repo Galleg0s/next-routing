@@ -37,7 +37,6 @@ function NewsletterRegistration() {
             message: "Successfully registered for newsletter",
             status: "success",
           });
-          console.log(data);
         })
         .catch((error) => {
           notificationCtx.showNotification({
