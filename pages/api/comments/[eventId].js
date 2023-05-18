@@ -5,62 +5,81 @@ export default async function handler(req, res) {
   const dbName = "events";
 
   try {
-    client = await getClient();
-  } catch (err) {
-    console.error(`Failed to connect to database: ${err}`);
-    return res.status(500).json({ message: `Failed to connect to database.` });
-  }
+    try {
+      client = await getClient();
+    } catch (err) {
+      console.error(`Failed to connect to database: ${err}`);
 
-  const db = client.db(dbName);
-  const collection = db.collection("comments");
-
-  if (req.method === "POST") {
-    const eventId = req.query.eventId;
-
-    const { email, name, text } = req.body;
-
-    if (
-      !email.includes("@") ||
-      !name ||
-      name.trim() === "" ||
-      !text ||
-      text.trim() === ""
-    ) {
-      return res.status(422).json({ message: "Invalid Input." });
+      return res
+        .status(500)
+        .json({ message: `Failed to connect to database.` });
     }
 
-    const newComment = { eventId, email, name, text };
+    const db = client.db(dbName);
+    const collection = db.collection("comments");
 
-    try {
-      const result = await collection
-        .insertOne({ ...newComment })
-        .then((result) => {
-          return {
-            ...newComment,
-            id: result.insertedId,
-          };
+    if (req.method === "POST") {
+      const eventId = req.query.eventId;
+
+      const { email, name, text } = req.body;
+
+      if (
+        !email.includes("@") ||
+        !name ||
+        name.trim() === "" ||
+        !text ||
+        text.trim() === ""
+      ) {
+        return res.status(422).json({ message: "Invalid Input." });
+      }
+
+      let newComment = { eventId, email, name, text };
+
+      let result;
+      try {
+        result = await collection.insertOne({ ...newComment });
+      } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+          message: "An error occurred while sending a comment.",
+        });
+        return;
+      }
+
+      newComment = {
+        ...newComment,
+        id: result.insertedId,
+      };
+
+      res.status(201).json({ message: "Added comment", comment: newComment });
+    } else if (req.method === "GET") {
+      let documents;
+      const eventId = req.query.eventId;
+      try {
+        documents = await collection
+          .find({ eventId: eventId })
+          .sort({ _id: -1 })
+          .toArray();
+      } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+          message: "An error occurred while getting all the comments.",
         });
 
-      res.status(201).json({ message: "Added comment", comment: result });
-    } catch (error) {
-      console.error(error);
-
-      res.status(500).json({
-        message: "An error occurred while sending a comment.",
-      });
-    }
-  } else if (req.method === "GET") {
-    try {
-      const documents = await collection.find().sort({ _id: -1 }).toArray();
-
+        return;
+      }
       res.status(200).json({ comments: documents });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        message: "An error occurred while getting all the comments.",
-      });
+    } else {
+      return res.status(405).json({ message: "Method not supported" });
     }
-  } else {
-    return res.status(405).json({ message: "Method not supported" });
+  } catch (error) {
+    console.error(`Failed to process request: ${error}`);
+    return res.status(500).json({ message: `Failed to process request.` });
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 }
